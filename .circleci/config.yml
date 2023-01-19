@@ -22,25 +22,26 @@ jobs:
       - run:
           name: "build"
           command: "npm build"
-      - persist_to_workspace:
-          root: ~/ 
+      - save_cache:
+          key: "npm-packages"
           paths: 
-            - node_modules
+            - /src/node_modules
   test:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: "run the tests"
-          command: "npm run test"
+      - restore_cache:
+          keys:
+            - "npm-packages"
+      - run: npm i
+      - run: npm test
   analyze:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - attach_workspace:
-          at: ~/
+      - restore_cache:
+          keys:
+            - "npm-packages"
       - run:
           name: "Analyze the packages"
           command: "npm audit"
